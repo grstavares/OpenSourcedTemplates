@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Metadata:
+    License: Apache-2.0
+Description: 'AWS CloudFormation to allow assume role in other account'
+Parameters:
+    ExternalAccountId:
+        Description: 'External Accound Id'
+        Type: String
+    ExternalRole:
+        Description: 'Name of the Role in the External Account with Access Permissions'
+        Default: 'OrganizationAccountAccessRole'
+        Type: String
+Resources:
+    AccessRole:
+        Type: 'AWS::IAM::ManagedPolicy'
+        Properties:
+            ManagedPolicyName: !Join ['', ['GrantAccessToAccount-', !Ref 'ExternalAccountId']]
+            Description: !Join ['', ['Allow Access to Role ', !Ref 'ExternalRole', ' in account ', !Ref 'ExternalAccountId']]
+            PolicyDocument:
+                Version: 2012-10-17
+                Statement:
+                    - Effect: Allow
+                      Action:
+                          - 'sts:AssumeRole'
+                      Resource: !Join ['', ['arn:aws:iam::', !Ref 'ExternalAccountId', ':role/', !Ref 'ExternalRole']]

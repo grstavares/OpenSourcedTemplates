@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Metadata:
+  License: Apache-2.0
+Description: 'AWS CloudFormation Template for Admin User'
+Parameters:
+  Username:
+    Type: String
+    Description: Username (must be unique in the account)
+    MinLength: '1'
+    MaxLength: '30'
+    ConstraintDescription: the password must be between 1 and 30 characters
+  Password:
+    NoEcho: 'true'
+    Type: String
+    Description: New account password
+    MinLength: '1'
+    MaxLength: '41'
+    ConstraintDescription: the password must be between 1 and 41 characters
+Resources:
+  AdminUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref 'Username'
+      LoginProfile:
+        Password: !Ref 'Password'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+Outputs:
+  Username:
+    Value: !Ref 'Username'
+    Description: Username to be used to access the account

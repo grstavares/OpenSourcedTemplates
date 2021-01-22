@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Metadata:
+  License: Apache-2.0
+Description: 'AWS CloudFormation to enable Admin from Other AWS Account'
+Parameters:
+  AccountId:
+    Description: 'Accound Id that will have access to Admin the current Account'
+    MinLength: '12'
+    MaxLength: '12'
+    Type: String
+  Creator:
+    Description: 'Name of the person executing this template'
+    Type: String
+Resources:
+  AccessRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Join ['', ['AdminAccess-', !Ref 'AccountId']]
+      Description: !Join ['', ['Allow account ', !Ref 'AccountId', ' administer this account!']]
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                - !Join ['', ['arn:aws:iam::', !Ref 'AccountId', ':root']]
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: '*'
+                Resource: '*'
+      Tags:
+        - Key: CreatedBy
+          Value: !Ref 'Creator'
+Outputs:
+  RoleName:
+    Value: !Join ['', ['AdminAccess-', !Ref 'AccountId']]
+    Description: Name of the role to be used by the external user
